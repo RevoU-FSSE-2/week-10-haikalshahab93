@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt")
 const StandardError = require("../constant/standard-error")
 const generateToken = require("../utils/jwt-token")
+const jwt = require('jsonwebtoken')
 
 const registerUser = async ({ db, username, password, role }) => {
   const user = await db.collection("users").findOne({ username })
@@ -21,7 +22,8 @@ const registerUser = async ({ db, username, password, role }) => {
 }
 
 const loginUser = async ({ db, username, password }) => {
-   const user = await db.collection("users").findOne({ username })
+  const SECRET_KEY = "haikalshahab"
+  const user = await db.collection("users").findOne({ username })
    
    if (!user) {
      throw new StandardError({ message: "User not found", status: 404 })
@@ -31,7 +33,7 @@ const loginUser = async ({ db, username, password }) => {
   if (!isPasswordCorrect) {
     throw new StandardError({ message: "Password incorrect", status: 401 })
   }
-  const token = jwt.sign({ id: user._id, role: user.role, username: user.username }, process.env.SECRET_KEY)
+  const token = jwt.sign({ id: user._id, role: user.role, username: user.username }, SECRET_KEY)
   
   return token
 }
